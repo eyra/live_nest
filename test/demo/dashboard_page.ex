@@ -3,6 +3,7 @@ defmodule LiveNest.Demo.Dashboard.Page do
     This module defines the demo routed live view.
     """
 
+    use Phoenix.LiveView
     use LiveNest, :routed_live_view
     use LiveNest, :single_modal_presenter_strategy
 

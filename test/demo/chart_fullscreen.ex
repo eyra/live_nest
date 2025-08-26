@@ -3,6 +3,7 @@ defmodule LiveNest.Demo.Chart.Fullscreen do
   This module defines the demo modal live view.
   """
 
+  use Phoenix.LiveView
   use LiveNest, :modal_live_view
 
   import LiveNest.Demo.HTML, only: [modal: 1]

@@ -3,6 +3,7 @@ defmodule LiveNest.Demo.Data.Widget do
   This module defines the demo embedded live view (2nd level of nesting).
   """
 
+  use Phoenix.LiveView
   use LiveNest, :embedded_live_view
 
   def mount(:not_mounted_at_router, %{"title" => title}, socket) do

@@ -30,15 +30,19 @@ LiveNest provides a suite of macros for structuring your LiveViews:
 
 ```elixir
 # For primary routed LiveViews
+use Phoenix.LiveView
 use LiveNest, :routed_live_view
 
 # For nested LiveViews
+use Phoenix.LiveView
 use LiveNest, :embedded_live_view
 
 # For modal LiveViews
+use Phoenix.LiveView
 use LiveNest, :modal_live_view
 
 # For modal LiveComponents
+use Phoenix.LiveComponent
 use LiveNest, :modal_live_component
 ```
 
@@ -48,7 +52,7 @@ Implement nested LiveViews with session-based configuration:
 
 ```elixir
 # Utilize Phoenix's live_render with session parameters
-{live_render(@socket, MyApp.MyLiveView, id: "my-live-view", session: %{"key1" => "value1", "key2" => "value2"})}
+{live_render(@socket, MyApp.MyLiveView, id: "my-live-view", session: [key1: "value1", key2: "value2"])}
 
 # Implement mount callback in the nested LiveView
 def mount(:not_mounted_at_router, %{"key1" => "value1", "key2" => "value2"}, socket)

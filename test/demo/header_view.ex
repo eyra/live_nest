@@ -3,6 +3,7 @@ defmodule LiveNest.Demo.Header.View do
   This module defines the demo embedded live view (1st level of nesting).
   """
 
+  use Phoenix.LiveView
   use LiveNest, :embedded_live_view
 
   @impl true

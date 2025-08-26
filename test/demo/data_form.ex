@@ -3,6 +3,7 @@ defmodule LiveNest.Demo.Data.Form do
   This module defines the demo modal live component.
   """
 
+  use Phoenix.LiveComponent
   use LiveNest, :modal_live_component
   import LiveNest.Demo.HTML, only: [modal: 1]
 

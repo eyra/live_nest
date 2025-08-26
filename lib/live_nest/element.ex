@@ -37,33 +37,49 @@ defmodule LiveNest.Element do
 
   @type id :: atom() | binary()
   @type type :: :live_view | :live_component | :component
-  @type options :: map()
+  @type options :: keyword()
   @type implementation :: atom()
 
-  @type t :: %__MODULE__{id: id, type: type(), options: options(), implementation: implementation()}
+  @type t :: %__MODULE__{
+          id: id,
+          type: type(),
+          options: options(),
+          implementation: implementation()
+        }
   defstruct [:id, :type, :options, :implementation]
 
-  @spec prepare_live_view(id(), module(), map()) :: t()
-  def prepare_live_view(id, module, session \\ %{}) when is_atom(module) do
-    %Element{id: id, type: :live_view, implementation: module, options: prepare_options(session, id, :live_view)}
+  @spec prepare_live_view(id(), module(), options()) :: t()
+  def prepare_live_view(id, module, options \\ []) when is_atom(module) do
+    %Element{
+      id: id,
+      type: :live_view,
+      implementation: module,
+      options: enrich_options(options, id)
+    }
   end
 
-  @spec prepare_live_component(id(), module(), map()) :: t()
-  def prepare_live_component(id, module, params \\ %{}) when is_atom(module) do
-    %Element{id: id, type: :live_component, implementation: module, options: prepare_options(params, id, :live_component)}
+  @spec prepare_live_component(id(), module(), options()) :: t()
+  def prepare_live_component(id, module, options \\ []) when is_atom(module) do
+    %Element{
+      id: id,
+      type: :live_component,
+      implementation: module,
+      options: enrich_options(options, id)
+    }
   end
 
-  @spec prepare_component(id(), function(), map()) :: t()
-  def prepare_component(id, function, assigns \\ %{}) when is_function(function, 1) do
-    %Element{id: id, type: :component, implementation: function, options: prepare_options(assigns, id, :component)}
+  @spec prepare_component(id(), function(), options()) :: t()
+  def prepare_component(id, function, options \\ []) do
+    %Element{
+      id: id,
+      type: :component,
+      implementation: function,
+      options: enrich_options(options, id)
+    }
   end
 
-  defp prepare_options(%{} = input_map, id, :live_view) do
-    Map.merge(input_map, %{"element_id" => id})
-  end
-  
-  defp prepare_options(%{} = input_map, id, _) do
-    Map.merge(input_map, %{element_id: id})
+  defp enrich_options(options, id) do
+    Keyword.put(options, :element_id, id)
   end
 
   # On mount for live_views to assign the id

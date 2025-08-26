@@ -9,7 +9,11 @@ defmodule LiveNest.Modal.Controller do
         use LiveNest.Modal.Controller
 
         def handle_event("present_my_modal", _, socket) do
-            modal = LiveNest.Modal.prepare_live_view("my-modal", MyApp.MyModal)
+            modal = LiveNest.Modal.prepare_live_view(
+                "my-modal", 
+                MyApp.MyModal, 
+                session: %{"some_key" => "some_value"}
+            )
             socket |> present_modal(modal)
         end
     end
@@ -24,15 +28,6 @@ defmodule LiveNest.Modal.Controller do
             require LiveNest.Constants
             @present_modal_event LiveNest.Constants.present_modal_event
             @hide_modal_event LiveNest.Constants.hide_modal_event
-
-            def present_as_modal(socket, %LiveNest.Element{} = element) do
-                modal = %LiveNest.Modal{
-                    modal_controller_pid: self(),
-                    element: element
-                }
-
-                present_modal(socket, modal)
-            end
 
             def present_modal(socket, %LiveNest.Modal{} = modal) do
                 publish_event(socket, %LiveNest.Event{

@@ -1,4 +1,8 @@
 defmodule LiveNest.Support.TestApplication do
+  @moduledoc """
+  A test application for the LiveNest framework.
+  """
+
   use Application
 
   @impl true
@@ -8,4 +12,4 @@ defmodule LiveNest.Support.TestApplication do
     opts = [strategy: :one_for_one, name: LiveNest.Supervisor]
     Supervisor.start_link(children, opts)
   end
-end 
+end

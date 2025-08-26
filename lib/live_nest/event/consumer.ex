@@ -1,37 +1,55 @@
 defmodule LiveNest.Event.Consumer do
-    @moduledoc """
-    A behaviour for handling events in LiveNest.
-    """
+  @moduledoc """
+  A behaviour for handling events in LiveNest.
+  """
 
-    @callback consume_event(LiveNest.Event.t(), Phoenix.LiveView.Socket.t()) :: {:continue | :stop, Phoenix.LiveView.Socket.t()}
+  alias Phoenix.LiveView.Socket
+  alias LiveNest.Event
 
-    defmacro __using__(_opts) do
-        quote do
-            @behaviour LiveNest.Event.Consumer
-            alias LiveNest.Event
+  @callback consume_event(event :: Event.t(), socket :: Socket.t()) ::
+              {:continue, Socket.t()} | {:stop, Socket.t()}
 
-            def handle_info({@event, event} = message, socket) do
-                socket = 
-                    case consume_event(event, socket) do
-                        {:continue, socket} -> Event.Publisher.publish_event(socket, event)
-                        {:stop, socket} -> socket
-                        _ -> raise "Unexpected response from consume_event/2. Please make sure to return {:continue, socket} or {:stop, socket}."
-                    end
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour LiveNest.Event.Consumer
+      require Logger
 
-                {:noreply, socket}
-            end
+      alias LiveNest.Event
 
-            @before_compile {LiveNest.Event.Consumer, :add_fallback_behaviour}
-        end
+      def handle_info({@event, event} = message, socket) do
+        {
+          :noreply,
+          event
+          |> consume_event(socket)
+          |> handle_consumed_event(event)
+        }
+      end
+
+      def handle_consumed_event({:continue, socket}, event) do
+        socket |> Event.Publisher.publish_event(event)
+      end
+
+      def handle_consumed_event({:stop, socket}, _event) do
+        socket
+      end
+
+      def handle_consumed_event(result, _event) do
+        raise "Incorrect result from consume_event/2: #{inspect(result)}"
+      end
+
+      @before_compile {LiveNest.Event.Consumer, :add_fallback_behaviour}
     end
+  end
 
-    defmacro add_fallback_behaviour(_env) do
-        quote do
-            def consume_event(event, socket) do
-                Logger.debug("consume_event/2 not implemented for #{__MODULE__}, skipping event")
-                {:continue, socket}
-            end
-        end
+  defmacro add_fallback_behaviour(_env) do
+    quote do
+      def consume_event(event, socket) do
+        Logger.debug(
+          "[Warning] #{__MODULE__}.consume_event/2 not implemented for event #{inspect(event)}"
+        )
+
+        {:continue, socket}
+      end
     end
+  end
 end
-

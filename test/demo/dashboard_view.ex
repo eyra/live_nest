@@ -3,6 +3,7 @@ defmodule LiveNest.Demo.Dashboard.View do
   This module defines the demo embedded live view (1st level of nesting).
   """
 
+  use Phoenix.LiveView
   use LiveNest, :embedded_live_view
   use LiveNest.Modal, :live_view
 
@@ -16,8 +17,8 @@ defmodule LiveNest.Demo.Dashboard.View do
   def assign_widgets(socket) do
     assign(socket,
       widgets: [
-        LiveNest.Element.prepare_live_view("data-widget", LiveNest.Demo.Data.Widget, %{"title" => "User Stats"}),
-        LiveNest.Element.prepare_live_view("chart-widget", LiveNest.Demo.Chart.Widget, %{"title" => "Activity Chart"}) 
+        LiveNest.Element.prepare_live_view("data-widget", LiveNest.Demo.Data.Widget, title: "User Stats"),
+        LiveNest.Element.prepare_live_view("chart-widget", LiveNest.Demo.Chart.Widget, title: "Activity Chart") 
       ]
     )
   end

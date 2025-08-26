@@ -3,14 +3,18 @@ defmodule LiveNest.Demo.Chart.Widget do
   This module defines the demo embedded live view (2nd level of nesting).
   """
 
+  use Phoenix.LiveView
   use LiveNest, :embedded_live_view
 
   def mount(:not_mounted_at_router, %{"title" => title}, socket) do
-    chart_fullscreen_modal = LiveNest.Modal.prepare_live_view("chart-fullscreen", LiveNest.Demo.Chart.Fullscreen)
+    chart_fullscreen_modal =
+      LiveNest.Modal.prepare_live_view("chart-fullscreen", LiveNest.Demo.Chart.Fullscreen,
+        session: [id: "1"]
+      )
 
     {
-      :ok, 
-      socket 
+      :ok,
+      socket
       |> assign(
         title: title,
         chart_fullscreen_modal: chart_fullscreen_modal
@@ -18,8 +22,12 @@ defmodule LiveNest.Demo.Chart.Widget do
     }
   end
 
-  def handle_event("maximize", _, %{assigns: %{chart_fullscreen_modal: chart_fullscreen_modal}} = socket) do
-    {:noreply, socket|> present_modal(chart_fullscreen_modal)}
+  def handle_event(
+        "maximize",
+        _,
+        %{assigns: %{chart_fullscreen_modal: chart_fullscreen_modal}} = socket
+      ) do
+    {:noreply, socket |> present_modal(chart_fullscreen_modal)}
   end
 
   def render(assigns) do
@@ -33,7 +41,7 @@ defmodule LiveNest.Demo.Chart.Widget do
           </svg>
         </button>
       </div>
-      
+
       <div class="h-48 flex items-center justify-center">
         <div class="text-center">
           <p class="text-gray-600">Chart widget content</p>
@@ -43,5 +51,4 @@ defmodule LiveNest.Demo.Chart.Widget do
     </div>
     """
   end
-
-end 
+end

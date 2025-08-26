@@ -20,23 +20,36 @@ defmodule LiveNest.HTML do
   attr(:id, :any, required: true)
   attr(:type, :any, required: true)
   attr(:implementation, :any)
-  attr(:options, :any)
+  attr(:options, :list, default: [])
 
-  def element(%{type: :live_view} = assigns) do
+  def element(%{type: :live_view, options: options} = assigns) do
+    session = 
+      options
+      |> Enum.map(fn {key, value} -> {Atom.to_string(key), value} end)
+      |> Enum.into(%{})
+
+    assigns = Map.put(assigns, :session, session)
+
     ~H"""
-      <.live_view socket={@socket} id={@id} module={@implementation} session={@options} />
+      <.live_view socket={@socket} id={@id} module={@implementation} session={@session} />
     """
   end
 
-  def element(%{type: :live_component} = assigns) do
+  def element(%{type: :live_component, options: options} = assigns) do
+    assigns = 
+      Map.put(assigns, :params, Enum.into(options, %{}))
+
     ~H"""
-      <.live_component id={@id} module={@implementation} {@options} />
+      <.live_component id={@id} module={@implementation} {@params} />
     """
   end
 
-  def element(%{type: :component} = assigns) do  
+  def element(%{type: :component, options: options} = assigns) do  
+    assigns = 
+      Map.put(assigns, :assigns, Enum.into(options, %{}))
+
     ~H"""
-      <.component id={@id} function={@implementation} assigns={@options} />
+      <.component id={@id} function={@implementation} assigns={@assigns} />
     """
   end
 

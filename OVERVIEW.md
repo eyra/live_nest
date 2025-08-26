@@ -38,13 +38,15 @@ The modal system is implemented through the `LiveNest.Modal` module, which provi
 ```elixir
 # Type definitions
 @type id :: atom() | binary()
+@type style :: atom()
+@type visible :: boolean()
 @type modal_controller_pid :: pid()
 @type element :: LiveNest.Element.t()
-@type t :: %__MODULE__{modal_controller_pid: modal_controller_pid, element: element()}
+@type t :: %__MODULE__{style: style, visible: visible, modal_controller_pid: modal_controller_pid, element: element()}
 
 # Preparation functions
-def prepare_live_view(id, module, session \\ %{})
-def prepare_live_component(id, module, params \\ %{})
+def prepare_live_view(id, module, options \\ [])
+def prepare_live_component(id, module, options \\ [])
 
 # Mount hooks
 def on_mount(:initialize, _params, session, socket)
@@ -72,15 +74,19 @@ LiveNest provides several macros for structuring LiveViews:
 
 ```elixir
 # Routed LiveView
+use Phoenix.LiveView
 use LiveNest, :routed_live_view
 
 # Embedded LiveView
+use Phoenix.LiveView
 use LiveNest, :embedded_live_view
 
 # Modal LiveView
+use Phoenix.LiveView
 use LiveNest, :modal_live_view
 
 # Modal LiveComponent
+use Phoenix.LiveComponent
 use LiveNest, :modal_live_component
 ```
 
