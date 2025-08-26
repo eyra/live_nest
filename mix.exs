@@ -4,7 +4,7 @@ defmodule LiveNest.MixProject do
   def project do
     [
       app: :live_nest,
-      version: "0.1.1",
+      version: "0.1.2",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
