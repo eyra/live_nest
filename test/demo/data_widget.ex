@@ -8,23 +8,25 @@ defmodule LiveNest.Demo.Data.Widget do
 
   def mount(:not_mounted_at_router, %{"title" => title}, socket) do
     {
-      :ok, 
-      socket 
+      :ok,
+      socket
       |> assign(title: title)
-      |> assign(config: %{
-        show_total: true,
-        show_active: true,
-        show_new: true
-      })
+      |> assign(
+        config: %{
+          show_total: true,
+          show_active: true,
+          show_new: true
+        }
+      )
     }
   end
 
   def handle_event("settings", _params, socket) do
     modal = LiveNest.Modal.prepare_live_component("data-form", LiveNest.Demo.Data.Form)
-    {:noreply, publish_event(socket, @present_modal_event, modal)}
+    {:noreply, publish_event(socket, @present_modal_event, %{modal: modal})}
   end
 
-  def consume_event(%{name: :update_settings, payload: config}, socket) do
+  def consume_event(%{name: :update_settings, payload: %{config: config}}, socket) do
     {:continue, socket |> assign(config: config)}
   end
 
@@ -53,4 +55,4 @@ defmodule LiveNest.Demo.Data.Widget do
     </div>
     """
   end
-end 
+end

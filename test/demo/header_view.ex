@@ -8,8 +8,9 @@ defmodule LiveNest.Demo.Header.View do
 
   @impl true
   def mount(_params, %{"id" => id, "title" => title}, socket) do
-    profile_form = LiveNest.Modal.prepare_live_component("profile-form", LiveNest.Demo.User.ProfileForm)
-    
+    profile_form =
+      LiveNest.Modal.prepare_live_component("profile-form", LiveNest.Demo.User.ProfileForm)
+
     {
       :ok,
       socket
@@ -29,14 +30,17 @@ defmodule LiveNest.Demo.Header.View do
   end
 
   require LiveNest.Constants
-  @close_modal_event LiveNest.Constants.close_modal_event
+  @close_modal_event LiveNest.Constants.close_modal_event()
 
   @doc """
     Intercept the close modal event and update the modal closed count.
     Bubble the event to the parent processes to handle the actual modal close.
   """
   @impl true
-  def consume_event(%{name: @close_modal_event, payload: "profile-form"}, %{assigns: %{modal_closed_count: count}} = socket) do
+  def consume_event(
+        %{name: @close_modal_event, payload: %{modal_id: "profile-form"}},
+        %{assigns: %{modal_closed_count: count}} = socket
+      ) do
     {:continue, socket |> assign(modal_closed_count: count + 1)}
   end
 
@@ -57,4 +61,4 @@ defmodule LiveNest.Demo.Header.View do
     </header>
     """
   end
-end 
+end

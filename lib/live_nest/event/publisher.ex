@@ -7,9 +7,14 @@ defmodule LiveNest.Event.Publisher do
   require LiveNest.Constants
   @event LiveNest.Constants.event()
 
-  def publish_event(socket, name, payload) do
-    event = %LiveNest.Event{name: name, payload: payload}
+  def publish_event(socket, name, payload) when is_atom(name) and is_map(payload) do
+    source = {self(), socket.id}
+    event = %LiveNest.Event{name: name, payload: payload, source: source}
     publish_event(socket, event)
+  end
+
+  def publish_event(socket, name) when is_atom(name) do
+    publish_event(socket, name, %{})
   end
 
   def publish_event(%{assigns: %{modal_controller_pid: modal_controller_pid}} = socket, event)

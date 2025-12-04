@@ -12,7 +12,6 @@ defmodule LiveNest.HTML do
 
   use Phoenix.Component
 
-
   @doc """
   Renders an element (LiveView, LiveComponent, or Component).
   """
@@ -23,7 +22,7 @@ defmodule LiveNest.HTML do
   attr(:options, :list, default: [])
 
   def element(%{type: :live_view, options: options} = assigns) do
-    session = 
+    session =
       options
       |> Enum.map(fn {key, value} -> {Atom.to_string(key), value} end)
       |> Enum.into(%{})
@@ -36,7 +35,7 @@ defmodule LiveNest.HTML do
   end
 
   def element(%{type: :live_component, options: options} = assigns) do
-    assigns = 
+    assigns =
       Map.put(assigns, :params, Enum.into(options, %{}))
 
     ~H"""
@@ -44,8 +43,8 @@ defmodule LiveNest.HTML do
     """
   end
 
-  def element(%{type: :component, options: options} = assigns) do  
-    assigns = 
+  def element(%{type: :component, options: options} = assigns) do
+    assigns =
       Map.put(assigns, :assigns, Enum.into(options, %{}))
 
     ~H"""
@@ -53,14 +52,19 @@ defmodule LiveNest.HTML do
     """
   end
 
-
   @doc """
   Renders a LiveView.
+
+  ## Options
+
+  * `:container` - A tuple `{tag, attrs}` to customize the wrapper element.
+    Defaults to `{:div, []}`. Example: `{:div, class: "h-full"}`
   """
   attr(:socket, :any, required: true)
   attr(:module, :any, required: true)
   attr(:id, :any, required: true)
   attr(:session, :any)
+  attr(:container, :any, default: {:div, class: "w-full h-full"})
 
   def live_view(%{session: nil} = assigns) do
     live_view(assigns |> Map.put(:session, %{}))
@@ -68,15 +72,13 @@ defmodule LiveNest.HTML do
 
   def live_view(assigns) do
     ~H"""
-    <div>
-      {live_render(@socket, @module, id: @id, session: @session)}
-    </div>
+    {live_render(@socket, @module, id: @id, session: @session, container: @container)}
     """
   end
 
   @doc """
   Renders a Component.
-  """ 
+  """
   attr(:id, :any, required: true)
   attr(:function, :any, required: true)
   attr(:assigns, :any)
@@ -88,5 +90,4 @@ defmodule LiveNest.HTML do
       </div>
     """
   end
-  
 end

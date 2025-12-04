@@ -33,15 +33,15 @@ defmodule LiveNest.Modal.Presenter do
       @hide_modal_event LiveNest.Constants.hide_modal_event()
       @close_modal_event LiveNest.Constants.close_modal_event()
 
-      def consume_event(%{name: @present_modal_event, payload: modal}, socket) do
+      def consume_event(%{name: @present_modal_event, payload: %{modal: modal}}, socket) do
         {:stop, handle_present_modal(socket, modal)}
       end
 
-      def consume_event(%{name: @hide_modal_event, payload: modal}, socket) do
+      def consume_event(%{name: @hide_modal_event, payload: %{modal: modal}}, socket) do
         {:stop, handle_hide_modal(socket, modal)}
       end
 
-      def consume_event(%{name: @close_modal_event, payload: modal_id}, socket) do
+      def consume_event(%{name: @close_modal_event, payload: %{modal_id: modal_id}}, socket) do
         {:stop, handle_close_modal(socket, modal_id)}
       end
     end

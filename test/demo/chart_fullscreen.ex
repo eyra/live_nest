@@ -11,9 +11,9 @@ defmodule LiveNest.Demo.Chart.Fullscreen do
   def mount(:not_mounted_at_router, _session, socket) do
     {:ok, socket}
   end
-  
+
   def handle_event("close_modal", _params, %{assigns: %{element_id: modal_id}} = socket) do
-    {:noreply, socket |> publish_event(@close_modal_event, modal_id)}
+    {:noreply, socket |> publish_event(@close_modal_event, %{modal_id: modal_id})}
   end
 
   def render(assigns) do
@@ -25,4 +25,4 @@ defmodule LiveNest.Demo.Chart.Fullscreen do
     </div>
     """
   end
-end 
+end
