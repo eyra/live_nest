@@ -9,15 +9,16 @@ defmodule LiveNest.Demo.Data.Form do
 
   def update(%{id: id}, socket) do
     {
-      :ok, 
-      socket 
+      :ok,
+      socket
       |> assign(
         id: id,
-        form: to_form(%{
-          "show_total" => true,
-          "show_active" => true,
-          "show_new" => true
-        })
+        form:
+          to_form(%{
+            "show_total" => true,
+            "show_active" => true,
+            "show_new" => true
+          })
       )
     }
   end
@@ -28,17 +29,18 @@ defmodule LiveNest.Demo.Data.Form do
       show_active: params["show_active"] == "true",
       show_new: params["show_new"] == "true"
     }
-    {:noreply, socket |> publish_event(:update_settings, config)}
+
+    {:noreply, socket |> publish_event(:update_settings, %{config: config})}
   end
 
   def handle_event("close_modal", _params, socket) do
     {:noreply, socket |> close_modal()}
   end
 
-  defp close_modal(socket) do
-    socket |> publish_event(@close_modal_event, %{})
+  defp close_modal(%{assigns: %{id: modal_id}} = socket) do
+    socket |> publish_event(@close_modal_event, %{modal_id: modal_id})
   end
-  
+
   def render(assigns) do
     ~H"""
     <div id={@id}>
@@ -66,4 +68,4 @@ defmodule LiveNest.Demo.Data.Form do
     </div>
     """
   end
-end 
+end

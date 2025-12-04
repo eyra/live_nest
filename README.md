@@ -94,7 +94,7 @@ LiveNest.Modal.prepare_live_component("my-live-component-modal", MyLiveComponent
 present_modal(socket, LiveNest.Modal.prepare_live_view("my-modal-live-view", MyModalLiveView))
 
 # Handle modal closure events
-def consume_event(%{name: @close_modal_event, payload: "my-modal-live-view"}, socket) do
+def consume_event(%{name: @close_modal_event, payload: %{modal_id: "my-modal-live-view"}}, socket) do
   {:noreply, close_modal(socket)}
 end
 ```

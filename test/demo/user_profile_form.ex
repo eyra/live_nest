@@ -2,7 +2,7 @@ defmodule LiveNest.Demo.User.ProfileForm do
   @moduledoc """
   This module defines the demo modal live component.
   """
-  
+
   use Phoenix.LiveComponent
   use LiveNest.Event.Publisher
 
@@ -13,8 +13,8 @@ defmodule LiveNest.Demo.User.ProfileForm do
 
   def update(%{id: id, modal_controller_pid: modal_controller_pid}, socket) do
     {
-      :ok, 
-      socket 
+      :ok,
+      socket
       |> assign(
         id: id,
         modal_controller_pid: modal_controller_pid,
@@ -38,7 +38,7 @@ defmodule LiveNest.Demo.User.ProfileForm do
   end
 
   defp close_modal(%{assigns: %{id: modal_id}} = socket) do
-    socket |> publish_event(@close_modal_event, modal_id)
+    socket |> publish_event(@close_modal_event, %{modal_id: modal_id})
   end
 
   def render(assigns) do
@@ -65,5 +65,4 @@ defmodule LiveNest.Demo.User.ProfileForm do
     </div>
     """
   end
-
-end 
+end
