@@ -11,13 +11,13 @@ defmodule LiveNest.Demo.User.ProfileForm do
   require LiveNest.Constants
   @close_modal_event LiveNest.Constants.close_modal_event()
 
-  def update(%{id: id, modal_controller_pid: modal_controller_pid}, socket) do
+  def update(%{id: id, live_nest: live_nest}, socket) do
     {
       :ok,
       socket
       |> assign(
         id: id,
-        modal_controller_pid: modal_controller_pid,
+        live_nest: live_nest,
         user: %{name: "Test User", email: "test@example.com"},
         form: to_form(%{"name" => "Test User", "email" => "test@example.com"})
       )
@@ -38,7 +38,7 @@ defmodule LiveNest.Demo.User.ProfileForm do
   end
 
   defp close_modal(%{assigns: %{id: modal_id}} = socket) do
-    socket |> publish_event(@close_modal_event, %{modal_id: modal_id})
+    socket |> publish_event({@close_modal_event, %{modal_id: modal_id}})
   end
 
   def render(assigns) do

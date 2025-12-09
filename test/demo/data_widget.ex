@@ -23,7 +23,7 @@ defmodule LiveNest.Demo.Data.Widget do
 
   def handle_event("settings", _params, socket) do
     modal = LiveNest.Modal.prepare_live_component("data-form", LiveNest.Demo.Data.Form)
-    {:noreply, publish_event(socket, @present_modal_event, %{modal: modal})}
+    {:noreply, publish_event(socket, {@present_modal_event, %{modal: modal}})}
   end
 
   def consume_event(%{name: :update_settings, payload: %{config: config}}, socket) do
