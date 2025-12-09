@@ -10,14 +10,14 @@ defmodule LiveNest.Modal do
   @type id :: atom() | binary()
   @type style :: atom()
   @type visible :: boolean()
-  @type modal_controller_pid :: pid()
+  @type controller_pid :: pid()
   @type element :: LiveNest.Element.t()
   @type options :: keyword()
 
   @type t :: %__MODULE__{
           style: style(),
           visible: visible(),
-          modal_controller_pid: modal_controller_pid(),
+          controller_pid: controller_pid(),
           element: element(),
           options: options()
         }
@@ -25,7 +25,7 @@ defmodule LiveNest.Modal do
   defstruct [
     :style,
     :visible,
-    :modal_controller_pid,
+    :controller_pid,
     :element,
     :options
   ]
@@ -40,9 +40,12 @@ defmodule LiveNest.Modal do
   @spec prepare_live_view(id(), module(), keyword()) :: t()
   def prepare_live_view(id, module, options \\ []) when is_atom(module) do
     {session, options} = Keyword.pop(options, :session, [])
-    session = enrich_element_options(session)
     element = LiveNest.Element.prepare_live_view(id, module, session)
-    prepare_modal(options, element)
+    modal = prepare_modal(options, element)
+
+    # Add live_nest context to element options so Modal View can access the modal
+    element_options = Keyword.put(element.options, :live_nest, %{modal: modal})
+    %{modal | element: %{element | options: element_options}}
   end
 
   @doc """
@@ -55,9 +58,12 @@ defmodule LiveNest.Modal do
   @spec prepare_live_component(id(), module(), keyword()) :: t()
   def prepare_live_component(id, module, options \\ []) when is_atom(module) do
     {params, options} = Keyword.pop(options, :params, [])
-    params = enrich_element_options(params)
     element = LiveNest.Element.prepare_live_component(id, module, params)
-    prepare_modal(options, element)
+    modal = prepare_modal(options, element)
+
+    # Add live_nest context to element options so Modal View can access the modal
+    element_options = Keyword.put(element.options, :live_nest, %{modal: modal})
+    %{modal | element: %{element | options: element_options}}
   end
 
   defp prepare_modal(options, element) do
@@ -68,25 +74,21 @@ defmodule LiveNest.Modal do
       style: style,
       visible: visible,
       options: options,
-      modal_controller_pid: self(),
+      controller_pid: self(),
       element: element
     }
   end
 
-  defp enrich_element_options(options) when is_list(options) do
-    Keyword.put(options, :modal_controller_pid, self())
-  end
-
   @doc """
-  On mount callback for LiveViews that initializes the modal controller pid.
+  On mount callback for LiveViews that initializes the LiveNest context.
   """
   def on_mount(:initialize, _params, session, socket) do
-    modal_controller_pid = Map.get(session, "modal_controller_pid")
-    {:cont, socket |> Phoenix.Component.assign(modal_controller_pid: modal_controller_pid)}
+    live_nest = Map.get(session, "live_nest", %{})
+    {:cont, socket |> Phoenix.Component.assign(live_nest: live_nest)}
   end
 
   @doc """
-  LiveView macro that initializes the modal controller pid.
+  LiveView macro that initializes the LiveNest context.
   """
   def live_view do
     quote do
@@ -95,16 +97,16 @@ defmodule LiveNest.Modal do
   end
 
   @doc """
-  LiveComponent macro that initializes the modal controller pid.
+  LiveComponent macro that initializes the LiveNest context.
   """
   def live_component do
     quote do
-      def update(%{modal_controller_pid: modal_controller_pid} = params, socket) do
-        params = Map.drop(params, [:modal_controller_pid])
+      def update(%{live_nest: live_nest} = params, socket) do
+        params = Map.drop(params, [:live_nest])
 
         update(
           params,
-          socket |> Phoenix.Component.assign(modal_controller_pid: modal_controller_pid)
+          socket |> Phoenix.Component.assign(live_nest: live_nest)
         )
       end
     end

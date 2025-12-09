@@ -40,9 +40,9 @@ The modal system is implemented through the `LiveNest.Modal` module, which provi
 @type id :: atom() | binary()
 @type style :: atom()
 @type visible :: boolean()
-@type modal_controller_pid :: pid()
+@type controller_pid :: pid()
 @type element :: LiveNest.Element.t()
-@type t :: %__MODULE__{style: style, visible: visible, modal_controller_pid: modal_controller_pid, element: element()}
+@type t :: %__MODULE__{style: style, visible: visible, controller_pid: controller_pid, element: element()}
 
 # Preparation functions
 def prepare_live_view(id, module, options \\ [])

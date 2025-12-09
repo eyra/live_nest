@@ -30,7 +30,7 @@ defmodule LiveNest.Demo.Data.Form do
       show_new: params["show_new"] == "true"
     }
 
-    {:noreply, socket |> publish_event(:update_settings, %{config: config})}
+    {:noreply, socket |> publish_event({:update_settings, %{config: config}})}
   end
 
   def handle_event("close_modal", _params, socket) do
@@ -38,7 +38,7 @@ defmodule LiveNest.Demo.Data.Form do
   end
 
   defp close_modal(%{assigns: %{id: modal_id}} = socket) do
-    socket |> publish_event(@close_modal_event, %{modal_id: modal_id})
+    socket |> publish_event({@close_modal_event, %{modal_id: modal_id}})
   end
 
   def render(assigns) do

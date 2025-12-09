@@ -8,8 +8,11 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
       @behaviour LiveNest.Modal.Presenter.Strategy
 
       import LiveNest.HTML
+      import LiveNest.Event.Publisher, only: [publish_event: 2, publish_event: 3]
 
       require Logger
+      require LiveNest.Constants
+      @modal_closed_event LiveNest.Constants.modal_closed_event()
 
       alias LiveNest.Element
       alias LiveNest.Event
@@ -39,11 +42,19 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
       end
 
       def handle_close_modal(
-            %{assigns: %{modal: %{element: %Element{id: current_modal_id}} = modal}} = socket,
+            %{
+              assigns: %{
+                modal:
+                  %{element: %Element{id: current_modal_id}, controller_pid: controller_pid} =
+                    modal
+              }
+            } = socket,
             modal_id
           )
           when current_modal_id == modal_id do
-        socket |> assign(:modal, nil)
+        socket
+        |> publish_event({@modal_closed_event, %{modal_id: modal_id}}, controller_pid)
+        |> assign(:modal, nil)
       end
 
       def handle_close_modal(

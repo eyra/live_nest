@@ -6,6 +6,9 @@ defmodule LiveNest.Demo.Chart.Widget do
   use Phoenix.LiveView
   use LiveNest, :embedded_live_view
 
+  require LiveNest.Constants
+  @modal_closed_event LiveNest.Constants.modal_closed_event()
+
   def mount(:not_mounted_at_router, %{"title" => title}, socket) do
     chart_fullscreen_modal =
       LiveNest.Modal.prepare_live_view("chart-fullscreen", LiveNest.Demo.Chart.Fullscreen,
@@ -17,7 +20,9 @@ defmodule LiveNest.Demo.Chart.Widget do
       socket
       |> assign(
         title: title,
-        chart_fullscreen_modal: chart_fullscreen_modal
+        chart_fullscreen_modal: chart_fullscreen_modal,
+        modal_closed_count: 0,
+        ping_count: 0
       )
     }
   end
@@ -28,6 +33,24 @@ defmodule LiveNest.Demo.Chart.Widget do
         %{assigns: %{chart_fullscreen_modal: chart_fullscreen_modal}} = socket
       ) do
     {:noreply, socket |> present_modal(chart_fullscreen_modal)}
+  end
+
+  @doc """
+  Handle the modal_closed event from the Modal Presenter.
+  This allows the Modal Controller to clean up resources when the modal is closed.
+  """
+  def consume_event(
+        %{name: @modal_closed_event, payload: %{modal_id: "chart-fullscreen"}},
+        %{assigns: %{modal_closed_count: count}} = socket
+      ) do
+    {:stop, socket |> assign(modal_closed_count: count + 1)}
+  end
+
+  def consume_event(
+        %{name: :ping_from_modal},
+        %{assigns: %{ping_count: count}} = socket
+      ) do
+    {:stop, socket |> assign(ping_count: count + 1)}
   end
 
   def render(assigns) do
@@ -46,6 +69,8 @@ defmodule LiveNest.Demo.Chart.Widget do
         <div class="text-center">
           <p class="text-gray-600">Chart widget content</p>
           <p class="text-sm text-gray-500 mt-2">ID: <%= @element_id %></p>
+          <p class="text-sm text-gray-500 mt-2">Modal closed <%= @modal_closed_count %> times</p>
+          <p class="text-sm text-gray-500 mt-2">Ping count: <%= @ping_count %></p>
         </div>
       </div>
     </div>
