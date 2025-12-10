@@ -53,7 +53,7 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
           )
           when current_modal_id == modal_id do
         socket
-        |> publish_event({@modal_closed_event, %{modal_id: modal_id}}, controller_pid)
+        |> maybe_notify_controller(controller_pid, modal_id)
         |> assign(:modal, nil)
       end
 
@@ -71,6 +71,15 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
       def handle_close_modal(socket, modal_id) do
         Logger.warning("Trying to close modal #{modal_id} but no modal is present")
         socket
+      end
+
+      defp maybe_notify_controller(socket, controller_pid, modal_id) do
+        if Process.alive?(controller_pid) do
+          publish_event(socket, {@modal_closed_event, %{modal_id: modal_id}}, controller_pid)
+        else
+          Logger.warning("Controller #{controller_pid} is not alive, cannot notify")
+          socket
+        end
       end
     end
   end

@@ -41,11 +41,20 @@ defmodule LiveNest.Event.Publisher do
   """
   # Modal View: has live_nest.modal in assigns (set via LiveNest.Modal.on_mount/4)
   def publish_event(
-        %{assigns: %{live_nest: %{modal: %{controller_pid: controller_pid}}}} = socket,
+        %{
+          parent_pid: parent_pid,
+          assigns: %{live_nest: %{modal: %{controller_pid: controller_pid} = modal}}
+        } = socket,
         event
       )
       when not is_nil(controller_pid) do
-    publish_event(socket, event, controller_pid)
+    if Process.alive?(controller_pid) do
+      publish_event(socket, event, controller_pid)
+    else
+      # Controller is dead, close the modal via presenter (parent)
+      modal_id = modal.element.id
+      publish_event(socket, {:close_modal, %{modal_id: modal_id}}, parent_pid)
+    end
   end
 
   # Live Component: publish to self (parent Live View)
