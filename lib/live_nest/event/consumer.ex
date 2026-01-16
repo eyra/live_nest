@@ -44,11 +44,25 @@ defmodule LiveNest.Event.Consumer do
   defmacro add_fallback_behaviour(_env) do
     quote do
       def consume_event(event, socket) do
-        Logger.debug(
-          "[Warning] #{__MODULE__}.consume_event/2 not implemented for event #{inspect(event)}"
-        )
+        target_pid = Event.Publisher.resolve_target_pid(socket)
 
-        {:continue, socket}
+        if target_pid == self() do
+          # Would send to self - this creates an infinite loop
+          # Fallback should stop propagation to self, only explicit handlers should continue to self
+          Logger.warning(
+            "[LiveNest] Stopping unhandled event to prevent infinite loop. " <>
+              "Event #{inspect(event.name)} would be sent to self. " <>
+              "Add a consume_event/2 handler in #{inspect(__MODULE__)} to handle this event."
+          )
+
+          {:stop, socket}
+        else
+          Logger.debug(
+            "[Warning] #{__MODULE__}.consume_event/2 not implemented for event #{inspect(event)}"
+          )
+
+          {:continue, socket}
+        end
       end
     end
   end
