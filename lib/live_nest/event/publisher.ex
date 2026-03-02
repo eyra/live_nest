@@ -95,6 +95,23 @@ defmodule LiveNest.Event.Publisher do
     socket
   end
 
+  @doc """
+  Resolves the target PID for an event based on socket context.
+
+  Used by Consumer to detect potential infinite loops before publishing.
+  """
+  def resolve_target_pid(%{
+        parent_pid: parent_pid,
+        assigns: %{live_nest: %{modal: %{controller_pid: controller_pid}}}
+      })
+      when not is_nil(controller_pid) do
+    if Process.alive?(controller_pid), do: controller_pid, else: parent_pid
+  end
+
+  def resolve_target_pid(%{assigns: %{myself: _myself}}), do: self()
+  def resolve_target_pid(%{parent_pid: parent_pid}) when is_pid(parent_pid), do: parent_pid
+  def resolve_target_pid(_socket), do: self()
+
   defp prepare_event({name, payload}, source) when is_atom(name) and is_map(payload) do
     %LiveNest.Event{name: name, payload: payload, source: source}
   end

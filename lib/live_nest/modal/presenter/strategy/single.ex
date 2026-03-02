@@ -19,7 +19,7 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
       alias LiveNest.Modal
 
       def handle_present_modal(socket, %Modal{} = modal) do
-        socket |> assign(:modal, modal)
+        socket |> Phoenix.Component.assign(:modal, modal)
       end
 
       def handle_hide_modal(
@@ -27,7 +27,7 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
             %Modal{element: %Element{id: modal_id}}
           )
           when current_modal_id == modal_id do
-        socket |> assign(:modal, nil)
+        socket |> Phoenix.Component.assign(:modal, nil)
       end
 
       def handle_hide_modal(
@@ -54,7 +54,7 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
           when current_modal_id == modal_id do
         socket
         |> maybe_notify_controller(controller_pid, modal_id)
-        |> assign(:modal, nil)
+        |> Phoenix.Component.assign(:modal, nil)
       end
 
       def handle_close_modal(
