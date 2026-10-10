@@ -36,7 +36,7 @@ defmodule LiveNest.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.7"},
-      {:phoenix_live_view, "~> 1.1.10"},
+      {:phoenix_live_view, "~> 1.2.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:plug_cowboy, "~> 2.6", only: :test},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
